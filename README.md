@@ -26,10 +26,11 @@ For Colab, upload the notebook and eight files, set DATA_DIR to their folder, an
 - Removed unsupported production-deployment, 100x benchmark and extrapolated future-revenue claims.
 
 ## Files and evidence
-`hackathon.ipynb` and `analysis.py` are the corrected workflow. `EV_Battery_Swap_Analysis_Report_Corrected.docx` is the revised report; its original numerical outputs are explicitly marked provisional, pending rerun. `archive/original_hackathon.ipynb` preserves the original cached outputs. The original report and visuals are retained for traceability. The presentation script is an honest three-minute draft, not a recorded video.
+`hackathon.ipynb` and `analysis.py` are the corrected workflow. [EV_Battery_Swap_Analysis_Report_Corrected.pdf](EV_Battery_Swap_Analysis_Report_Corrected.pdf) is the sole current report; its original numerical outputs are explicitly marked provisional, pending rerun. `archive/original_hackathon.ipynb` preserves the original cached outputs. All original charts are retained within the corrected PDF. Superseded reports remain recoverable from Git history. The presentation script is an honest three-minute draft, not a recorded video.
 
 ## Remaining analytical limitations
 The code provides descriptive comparisons, not causal estimates. Battery lifetime cycles are not supplied. Full wear-cost allocation, controlled pricing-pilot evaluation, adjusted battery swap-frequency comparisons and a prospective churn model are not completed. The supplied brief is an open analytics challenge; it does not require a classifier. Do not call this package a fully verified final-data analysis until the original files can be rerun.
 
 ## Source and attribution
 Synthetic data generated for the Gradient Learnings Data Analytics Hackathon, seed 59500; company and partner names are fictional. Original project: https://github.com/himanshumittal1439/Rider-Churn-Prediction-and-Retention-Analysis . Dataset use remains subject to the organizer's hackathon terms.
+
