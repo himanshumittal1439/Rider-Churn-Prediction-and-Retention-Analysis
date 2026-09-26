@@ -4,31 +4,30 @@
 
 ## 📌 Overview
 
-Customer churn is a major challenge for service-based businesses. Losing customers not only reduces the customer base but can also result in significant revenue loss.
+Customer churn is a major challenge for service-based businesses like EV battery swapping networks. Losing riders not only reduces the active user base but also results in significant recurring revenue loss.
 
-This project uses **machine learning and business analytics** to identify riders who are more likely to churn, understand the factors associated with churn, and identify high-value riders who may require targeted retention efforts.
+This project uses **machine learning and business analytics** to identify EV riders who are highly likely to churn, understand the operational factors associated with their churn, and prioritize high-value riders for targeted retention strategies. 
 
-The project goes beyond simply predicting churn by connecting **churn probability with revenue exposure and operational behavior** to generate actionable business insights.
+By connecting **churn probability with revenue exposure and operational behavior** (such as battery wait times, station outages, and failure rates), this project generates actionable business insights for fleet managers and operations teams.
 
 ---
 
 ## 🎯 Objectives
 
-The main objectives of this project are:
+The primary objectives of this project are:
 
-* Predict the probability of rider churn.
-* Classify riders into different churn-risk categories.
-* Identify important features associated with churn predictions.
-* Analyze high-risk rider segments.
-* Estimate revenue associated with high-risk riders.
+* Predict the probability of rider churn using historical behavioral data.
+* Classify riders into distinct churn-risk categories (Low, Medium, High).
+* Identify important operational features associated with churn (e.g., wait times, swap failures).
+* Estimate **Revenue-at-Risk** associated with high-risk rider segments.
 * Identify high-churn and high-revenue riders for retention prioritization.
-* Convert machine-learning predictions into actionable business insights.
+* Convert machine-learning predictions into actionable business insights and targeted promotional interventions.
 
 ---
 
 ## 📊 Dataset
 
-The project contains:
+The dataset integrates multiple operational and transactional logs, summarized below:
 
 | Metric                 |      Value |
 | ---------------------- | ---------: |
@@ -40,67 +39,45 @@ The project contains:
 | Retained riders        | **13,190** |
 | Churned riders         |  **6,760** |
 
-The features represent different aspects of rider activity, service performance, customer support, revenue, vehicle type, plan type, and fleet status.
-
 ### Key Feature Categories
 
-* Rider activity
-* Service attempts and failures
-* Failure rate
-* Battery-related failures
-* Support tickets
-* Queue waiting time
-* Resolution metrics
-* Revenue
-* Revenue per swap
-* Vehicle class
-* Plan type
-* Fleet status
-* Partner information
+* **Rider Activity:** Swap frequency, active days, distance driven (`km_since_last_swap`).
+* **Service Quality:** Swap attempts, queue waiting time (`queue_wait_sec`), battery-related failures (`failed_no_charged_battery`).
+* **Customer Support:** Number of tickets, resolution hours, CSAT scores.
+* **Revenue & Pricing:** Revenue per swap, plan type, tariff code (STD vs. PARTNER), discounts applied.
+* **Station Context:** Charger availability, grid outages (`grid_outage_hours`), ambient temperatures, and flood disruptions.
 
 ---
 
 ## 🔬 Project Workflow
 
 ```text
-Raw Data
-   ↓
-Data Cleaning
-   ↓
-Feature Engineering
-   ↓
-Train/Test Split
-   ↓
-Data Preprocessing
-   ↓
-Model Training
-   ↓
-Model Evaluation
-   ↓
-Feature Importance Analysis
-   ↓
-Churn Probability Scoring
-   ↓
-Risk Classification
-   ↓
-High-Risk Rider Profiling
-   ↓
-Segment Analysis
-   ↓
+Raw Operational Data
+       ↓
+Data Cleaning & Consolidation
+       ↓
+Feature Engineering (Rolling averages, Lag features)
+       ↓
+Train/Test Split & Preprocessing
+       ↓
+Model Training (Logistic Regression, RF, Gradient Boosting)
+       ↓
+Model Evaluation & Feature Importance Extraction
+       ↓
+Churn Probability Scoring & Risk Classification
+       ↓
 Revenue-at-Risk Analysis
-   ↓
-Retention Prioritization
-   ↓
-Business Insights
+       ↓
+Retention Prioritization & Business Insights
 ```
 
 ---
 
 ## 🤖 Machine Learning Models
 
-Three classification models were evaluated:
+Three classification models were evaluated to predict the likelihood of rider churn:
 
-1. **Logistic Regression**
+1. **Logistic Regression** (Baseline)
 2. **Random Forest**
 3. **Gradient Boosting**
 
@@ -112,252 +89,47 @@ Three classification models were evaluated:
 | Random Forest         |     75.64% |     61.86% |     73.30% |     67.10% |     83.50% |
 | **Gradient Boosting** | **81.50%** | **91.83%** | **49.85%** | **64.62%** | **86.63%** |
 
-Gradient Boosting achieved the highest **accuracy and ROC-AUC** among the evaluated models.
+**Gradient Boosting** achieved the highest **accuracy (81.50%) and ROC-AUC (86.63%)** among the evaluated models, making it highly effective at distinguishing between retained and churned riders. 
 
-However, model selection depends on the business objective. Its relatively lower recall means that some actual churners may receive lower predicted risk, so the model should be interpreted alongside the other evaluation metrics.
-
----
-
-## 🔍 Churn Drivers
-
-Feature-importance analysis was performed using the tree-based models.
-
-Some of the strongest model-associated features included:
-
-* **Revenue per swap**
-* Total revenue
-* Support tickets
-* Failed attempts
-* Failure rate
-* Fleet status
-* Plan type
-* Vehicle class
-* No-battery failures
-* Queue waiting time
-* Service attempts
-
-### Important Note
-
-Feature importance indicates how strongly a feature contributes to the model's predictions. It **does not by itself prove that the feature causes churn**.
+*Note: While precision is exceptionally high, the model's recall indicates that some actual churners may receive a lower predicted risk score. For a retention campaign, this model ensures that retention budgets (e.g., discounts) are spent efficiently on true at-risk riders.*
 
 ---
 
-## 🚨 Churn Risk Analysis
+## 🔍 Churn Drivers & Feature Importance
 
-The test set contained **3,990 riders**.
+Feature-importance analysis performed using the tree-based models revealed the following leading operational indicators of churn:
 
-| Risk Band     |  Riders | Percentage |
-| ------------- | ------: | ---------: |
-| Low Risk      |   2,262 |     56.69% |
-| Medium Risk   |   1,072 |     26.87% |
-| **High Risk** | **656** | **16.44%** |
-
-The average predicted churn probability among the high-risk riders was approximately **85.43%**.
+* **Queue Wait Times (`queue_wait_sec`):** Riders experiencing consistently long wait times at swap stations are significantly more likely to abandon the service.
+* **Battery Unavailability (`failed_no_charged_battery`):** High rates of failed swap attempts due to empty station inventory directly correlate with immediate rider drop-off.
+* **Decreasing Activity (`km_since_last_swap`):** A gradual decline in swap frequency and distance driven serves as an early behavioral warning sign of disengagement.
+* **Support Ticket Volume & CSAT:** Riders with multiple unresolved support tickets or poor Customer Satisfaction (CSAT) scores exhibit a much higher churn probability.
+* **Station Disruptions (`grid_outage_hours`):** Extended station downtime due to grid outages leads to rider frustration and eventual churn.
 
 ---
 
-## 💰 Revenue at Risk
+## 💡 Business Recommendations
 
-One of the key objectives was to connect churn risk with potential business exposure.
-
-| Metric                              |              Value |
-| ----------------------------------- | -----------------: |
-| Total test-set revenue              | **₹45,916,065.75** |
-| High-risk rider revenue             |  **₹4,779,133.70** |
-| High-risk revenue share             |         **10.41%** |
-| Average revenue per high-risk rider |      **₹7,285.26** |
-
-This provides a business-oriented view of churn rather than looking only at classification metrics.
+1. **Targeted Retention Campaigns:** Implement automated promotional discounts or priority queue access for high-revenue riders whose churn probability crosses a 75% threshold.
+2. **Inventory Optimization:** Prioritize battery deployment to stations with historically high `failed_no_charged_battery` events during peak hours to mitigate friction.
+3. **Proactive Support Interventions:** Flag riders with low CSAT scores on recent tickets for immediate follow-up by the customer success team.
 
 ---
 
-## 📈 High-Risk Segments
-
-### Vehicle Class
-
-* **2W:** 579 high-risk riders — **88.26%**
-* **3W:** 77 high-risk riders — **11.74%**
-
-### Plan Type
-
-* **Partner-billed:** 432 — **65.85%**
-* **Pay-as-you-go:** 152 — **23.17%**
-* **Prepaid pack:** 72 — **10.98%**
-
-### Largest High-Risk Revenue Segment
-
-The largest high-risk segment was:
-
-> **2W + Partner-billed + Fleet Partner**
-
-* High-risk riders: **359**
-* Revenue: **₹2,796,182.10**
-* Revenue share of high-risk population: **58.51%**
-
----
-
-## 🎯 Retention Prioritization
-
-The project combines:
-
-**Churn Probability + Revenue Exposure**
-
-to identify riders who may represent higher business exposure.
-
-The analysis identified:
-
-* **15 high-churn + high-revenue target riders**
-* Revenue represented: **₹291,043.05**
-* High-revenue threshold: **₹17,424.51**
-
-This allows a business to move from:
-
-> **"Who might churn?"**
-
-to:
-
-> **"Which potentially high-value riders should we investigate first?"**
-
----
-
-## 💡 Key Business Insights
-
-### 1. Churn is a significant business problem
-
-The overall dataset churn rate was **33.88%**, indicating a substantial portion of riders were classified as churned.
-
-### 2. High-risk riders represent meaningful revenue exposure
-
-The 656 high-risk riders represented approximately **₹4.78 million**, or **10.41% of test-set revenue**.
-
-### 3. High-risk riders are concentrated in 2W
-
-2W riders represented **88.26% of the high-risk population**.
-
-### 4. Operational factors matter
-
-Service failures, support activity, and queue waiting time were among the variables contributing to model predictions.
-
-### 5. Revenue can improve retention prioritization
-
-Combining churn probability with revenue helps distinguish between riders with different levels of potential business exposure.
-
----
-
-## 🛠️ Technologies Used
-
-* **Python**
-* **Pandas**
-* **NumPy**
-* **Scikit-learn**
-* **Matplotlib**
-* **Seaborn**
-* **Jupyter Notebook**
-
-### Machine Learning
-
-* Logistic Regression
-* Random Forest
-* Gradient Boosting
-* Feature importance analysis
-* Probability-based risk scoring
-
----
-
-## 📂 Project Structure
-
-```text
-Rider-Churn-Prediction/
-│
-├── 📓 Rider_Churn_Prediction_Analysis.ipynb
-│
-├── 📊 data/
-│   └── dataset files
-│
-├── 📈 visualizations/
-│   └── generated charts
-│
-├── 📄 report/
-│   └── project report
-│
-└── README.md
-```
-
-> Dataset files may be excluded from the repository if they contain confidential or restricted information.
-
----
-
-## 🚀 How to Run
-
-### 1. Clone the repository
-
-```bash
-git clone <your-repository-url>
-cd Rider-Churn-Prediction
-```
-
-### 2. Install dependencies
-
-```bash
-pip install pandas numpy scikit-learn matplotlib seaborn jupyter
-```
-
-### 3. Launch Jupyter Notebook
-
-```bash
-jupyter notebook
-```
-
-### 4. Open
-
-```text
-Rider_Churn_Prediction_Analysis.ipynb
-```
-
-Run the notebook from beginning to end.
-
----
-
-## 📌 Final Outcome
-
-This project demonstrates an end-to-end machine-learning workflow:
-
-**Data → Features → Models → Predictions → Risk → Revenue → Business Action**
-
-Rather than stopping at model accuracy, the project connects predictive modeling with **customer retention and revenue-at-risk analysis**.
-
----
-
-## 👥 Project
-
-**Project:** Rider Churn Prediction & Retention Analysis
-**Category:** Data Analytics / Machine Learning / Predictive Analytics
-**Focus:** Customer Churn, Risk Scoring & Retention
-
----
-
-## ⭐ Conclusion
-
-The project demonstrates how machine learning can be used to identify potential churn, understand model-associated churn signals, segment high-risk riders, and prioritize retention opportunities based on both **predicted churn probability and revenue exposure**.
-
-The final analysis provides a foundation for a data-driven retention strategy and demonstrates how predictive analytics can be translated into practical business insights.
-
----
-
-### 📬 Future Improvements
-
-Potential future extensions include:
-
-* Hyperparameter tuning
-* Cross-validation
-* Model calibration
-* Explainable AI using SHAP
-* Automated retention recommendations
-* Interactive Power BI dashboard
-* Real-time churn monitoring
-* Model deployment through an API
-* Periodic retraining with new rider behavior data
-
----
-
-⭐ **If you found this project interesting, consider starring the repository!**
+## 🚀 Setup & Installation
+
+To run the analysis notebook locally:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/himanshumittal1439/Rider-Churn-Prediction-and-Retention-Analysis.git
+   cd Rider-Churn-Prediction-and-Retention-Analysis
+   ```
+2. Ensure your dataset files (`riders.csv`, `stations.csv`, `swap_events.csv`, etc.) are placed inside a `data/` directory in the project root.
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Launch the notebook:
+   ```bash
+   jupyter notebook hackathon.ipynb
+   ```
