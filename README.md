@@ -1,144 +1,35 @@
-# 🚴 Rider Churn Prediction & Retention Analysis
+# VoltRelay network performance and rider retention
 
-> **A machine-learning based predictive analytics project for identifying riders at risk of churn and prioritizing retention opportunities using behavioral, operational, and revenue data.**
+Corrected submission covering network trends, service experience, station patterns, batteries, pricing and cohort retention.
 
-## 📌 Overview
+## Important execution status
+The original repository contains retrospective exploratory outputs. Its predictive scores are not validated deployment results. The corrected pipeline has validation tests, but a full-data rerun is blocked: Google Drive returned quota-exceeded pages for five of the eight source files. Do not claim that the corrected notebook has been run on all 3.88 million events. No new numerical results are invented.
 
-Customer churn is a major challenge for service-based businesses like EV battery swapping networks. Losing riders not only reduces the active user base but also results in significant recurring revenue loss.
+## Run
+1. Download the eight original files from the link in `data/README.md`.
+2. Put CSV or CSV.GZ files in `data/`.
+3. Install `pip install -r requirements.txt`.
+4. Run `jupyter notebook hackathon.ipynb` from this folder; run all cells in order.
+5. Alternatively run `python analysis.py --data-dir data --output-dir results`.
+6. Validate the critical logic with `python -m unittest discover -s tests -v`.
 
-This project uses **machine learning and business analytics** to identify EV riders who are highly likely to churn, understand the operational factors associated with their churn, and prioritize high-value riders for targeted retention strategies. 
+For Colab, upload the notebook and eight files, set DATA_DIR to their folder, and uncomment the dependency-install line. The analysis implementation is embedded in the notebook.
 
-By connecting **churn probability with revenue exposure and operational behavior** (such as battery wait times, station outages, and failure rates), this project generates actionable business insights for fleet managers and operations teams.
+## What changed
+- Removed machine-specific Downloads paths and supports compressed files.
+- Added explicit key checks, timestamp correction, test-station exclusion, conservative retry filtering, invalid-reading rules and quality counts.
+- Fixed queue aggregation weighting and missing-telemetry denominators.
+- Distinguished energy-only contribution, site expenses and unmeasured battery wear; removed profitability and budget-affordability claims.
+- Replaced target-overlapping churn features with equal-follow-up retention cohorts and pre-outcome experience windows.
+- Corrected ticket-category rates to count riders once per category.
+- Added supplier/lot/SOH comparisons, pricing segments and contract-amendment windows.
+- Removed unsupported production-deployment, 100x benchmark and extrapolated future-revenue claims.
 
----
+## Files and evidence
+`hackathon.ipynb` and `analysis.py` are the corrected workflow. `EV_Battery_Swap_Analysis_Report_Corrected.docx` is the revised report; its original numerical outputs are explicitly marked provisional, pending rerun. `archive/original_hackathon.ipynb` preserves the original cached outputs. The original report and visuals are retained for traceability. The presentation script is an honest three-minute draft, not a recorded video.
 
-## 🎯 Objectives
+## Remaining analytical limitations
+The code provides descriptive comparisons, not causal estimates. Battery lifetime cycles are not supplied. Full wear-cost allocation, controlled pricing-pilot evaluation, adjusted battery swap-frequency comparisons and a prospective churn model are not completed. The supplied brief is an open analytics challenge; it does not require a classifier. Do not call this package a fully verified final-data analysis until the original files can be rerun.
 
-The primary objectives of this project are:
-
-* Predict the probability of rider churn using historical behavioral data.
-* Classify riders into distinct churn-risk categories (Low, Medium, High).
-* Identify important operational features associated with churn (e.g., wait times, swap failures).
-* Estimate **Revenue-at-Risk** associated with high-risk rider segments.
-* Identify high-churn and high-revenue riders for retention prioritization.
-* Convert machine-learning predictions into actionable business insights and targeted promotional interventions.
-
----
-
-## 📊 Dataset
-
-The dataset integrates multiple operational and transactional logs, summarized below:
-
-| Metric                 |      Value |
-| ---------------------- | ---------: |
-| Total modeling records | **19,950** |
-| Training records       | **15,960** |
-| Testing records        |  **3,990** |
-| Processed features     |     **38** |
-| Overall churn rate     | **33.88%** |
-| Retained riders        | **13,190** |
-| Churned riders         |  **6,760** |
-
-### Key Feature Categories
-
-* **Rider Activity:** Swap frequency, active days, distance driven (`km_since_last_swap`).
-* **Service Quality:** Swap attempts, queue waiting time (`queue_wait_sec`), battery-related failures (`failed_no_charged_battery`).
-* **Customer Support:** Number of tickets, resolution hours, CSAT scores.
-* **Revenue & Pricing:** Revenue per swap, plan type, tariff code (STD vs. PARTNER), discounts applied.
-* **Station Context:** Charger availability, grid outages (`grid_outage_hours`), ambient temperatures, and flood disruptions.
-
----
-
-## 🔬 Project Workflow
-
-```text
-Raw Operational Data
-       ↓
-Data Cleaning & Consolidation
-       ↓
-Feature Engineering (Rolling averages, Lag features)
-       ↓
-Train/Test Split & Preprocessing
-       ↓
-Model Training (Logistic Regression, RF, Gradient Boosting)
-       ↓
-Model Evaluation & Feature Importance Extraction
-       ↓
-Churn Probability Scoring & Risk Classification
-       ↓
-Revenue-at-Risk Analysis
-       ↓
-Retention Prioritization & Business Insights
-```
-
----
-
-## 🤖 Machine Learning Models
-
-Three classification models were evaluated to predict the likelihood of rider churn:
-
-1. **Logistic Regression** (Baseline)
-2. **Random Forest**
-3. **Gradient Boosting**
-
-### Model Performance
-
-| Model                 |   Accuracy |  Precision |     Recall |   F1 Score |    ROC-AUC |
-| --------------------- | ---------: | ---------: | ---------: | ---------: | ---------: |
-| Logistic Regression   |     64.26% |     48.09% |     68.93% |     56.66% |     70.63% |
-| Random Forest         |     75.64% |     61.86% |     73.30% |     67.10% |     83.50% |
-| **Gradient Boosting** | **81.50%** | **91.83%** | **49.85%** | **64.62%** | **86.63%** |
-
-**Gradient Boosting** achieved the highest **accuracy (81.50%) and ROC-AUC (86.63%)** among the evaluated models, making it highly effective at distinguishing between retained and churned riders. 
-
-*Note: While precision is exceptionally high, the model's recall indicates that some actual churners may receive a lower predicted risk score. For a retention campaign, this model ensures that retention budgets (e.g., discounts) are spent efficiently on true at-risk riders.*
-
----
-
-## 🔍 Churn Drivers & Feature Importance
-
-Feature-importance analysis performed using the tree-based models revealed the following leading operational indicators of churn:
-
-* **Queue Wait Times (`queue_wait_sec`):** Riders experiencing consistently long wait times at swap stations are significantly more likely to abandon the service.
-* **Battery Unavailability (`failed_no_charged_battery`):** High rates of failed swap attempts due to empty station inventory directly correlate with immediate rider drop-off.
-* **Decreasing Activity (`km_since_last_swap`):** A gradual decline in swap frequency and distance driven serves as an early behavioral warning sign of disengagement.
-* **Support Ticket Volume & CSAT:** Riders with multiple unresolved support tickets or poor Customer Satisfaction (CSAT) scores exhibit a much higher churn probability.
-* **Station Disruptions (`grid_outage_hours`):** Extended station downtime due to grid outages leads to rider frustration and eventual churn.
-
----
-
-## 💡 Business Recommendations
-
-1. **Targeted Retention Campaigns:** Implement automated promotional discounts or priority queue access for high-revenue riders whose churn probability crosses a 75% threshold.
-2. **Inventory Optimization:** Prioritize battery deployment to stations with historically high `failed_no_charged_battery` events during peak hours to mitigate friction.
-3. **Proactive Support Interventions:** Flag riders with low CSAT scores on recent tickets for immediate follow-up by the customer success team.
-
----
-
-
-## ⚡ Performance Optimizations
-
-To handle the 3.88 million row dataset efficiently on standard hardware, the data processing pipeline was heavily optimized for C-level execution:
-* **Vectorized Datetime Bypassing:** Replaced slow pandas `to_datetime` parsing with native string slicing (`.str[:7]`) for YYYY-MM extraction, achieving a **~100x speedup** (reducing parse time from minutes to milliseconds).
-* **Cython Aggregations:** Eliminated custom Python lambdas inside `.groupby.agg()` by pre-computing boolean masks, keeping the aggregations running entirely in optimized C/Cython space.
-* **Vectorized Set Logic:** Replaced python-level `for` loops for duplication checks with native array-length comparisons and dictionary updates.
-
----
-## 🚀 Setup & Installation
-
-To run the analysis notebook locally:
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/himanshumittal1439/Rider-Churn-Prediction-and-Retention-Analysis.git
-   cd Rider-Churn-Prediction-and-Retention-Analysis
-   ```
-2. Ensure your dataset files (`riders.csv`, `stations.csv`, `swap_events.csv`, etc.) are placed inside a `data/` directory in the project root.
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Launch the notebook:
-   ```bash
-   jupyter notebook hackathon.ipynb
-   ```
+## Source and attribution
+Synthetic data generated for the Gradient Learnings Data Analytics Hackathon, seed 59500; company and partner names are fictional. Original project: https://github.com/himanshumittal1439/Rider-Churn-Prediction-and-Retention-Analysis . Dataset use remains subject to the organizer's hackathon terms.
